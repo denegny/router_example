@@ -5,11 +5,14 @@ defmodule RouterExample.Router do
 
   @template_dir "lib/router_example/templates"
 
-  plug Plug.Parsers, parsers: [:urlencoded, :json],
-                   pass: ["text/*"],
-                   json_decoder: Jason
-  plug :match
-  plug :dispatch
+  plug(Plug.Parsers,
+    parsers: [:urlencoded, :json],
+    pass: ["text/*"],
+    json_decoder: Jason
+  )
+
+  plug(:match)
+  plug(:dispatch)
 
   get "/ping" do
     send_resp(conn, 200, "pong")
@@ -39,11 +42,11 @@ defmodule RouterExample.Router do
       |> String.replace_suffix(".html", ".html.eex")
       |> EEx.eval_file(assigns)
 
-    send_resp(conn, (status || 200), body)
+    send_resp(conn, status || 200, body)
   end
 
   defp render_json(%{status: status} = conn, data) do
     body = Jason.encode!(data)
-    send_resp(conn, (status || 200), body)
+    send_resp(conn, status || 200, body)
   end
 end
